@@ -3,14 +3,14 @@ const en = {
     ok: "OK!",
     cancel: "Cancel",
     back: "Back",
-    logOut: "Log Out", // @demo remove-current-line
+    logOut: "Log Out",
   },
   welcomeScreen: {
     postscript:
-      "psst  — This probably isn't what your app looks like. (Unless your designer handed you these screens, and in that case, ship it!)",
-    readyForLaunch: "Your app, almost ready for launch!",
-    exciting: "(ohh, this is exciting!)",
-    letsGo: "Let's go!", // @demo remove-current-line
+      "psst  — this is a small project i made for school, there will be bugs :3",
+    readyForLaunch: "Welcome to AMC Goob Corp!",
+    exciting: "(how exciting!)",
+    letsGo: "Let's go!",
   },
   errorScreen: {
     title: "Something went wrong!",
@@ -26,7 +26,6 @@ const en = {
       button: "Let's try this again",
     },
   },
-  // @demo remove-block-start
   errors: {
     invalidEmail: "Invalid email address.",
   },
@@ -42,10 +41,10 @@ const en = {
     hint: "Hint: you can use any email address and your favorite password :)",
   },
   demoNavigator: {
-    componentsTab: "Components",
-    debugTab: "Debug",
-    communityTab: "Community",
-    podcastListTab: "Podcast",
+    componentsTab: "Home",
+    communityTab: "Usher",
+    podcastListTab: "Traffic",
+    debugTab: "Break Finder",
   },
   demoCommunityScreen: {
     title: "Connect with the community",
@@ -119,7 +118,6 @@ const en = {
         "No favorites have been added yet. Tap the heart on an episode to add it to your favorites!",
     },
   },
-  // @demo remove-block-end
 }
 
 export default en

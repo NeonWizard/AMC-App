@@ -13,8 +13,7 @@ import {
 } from "react-native"
 import { DrawerLayout, DrawerState } from "react-native-gesture-handler"
 import { useSharedValue, withTiming } from "react-native-reanimated"
-import { ListItem, Screen, Text } from "../../components"
-import { isRTL } from "../../i18n"
+import { Header, ListItem, Screen, Text } from "../../components"
 import { DemoTabParamList, DemoTabScreenProps } from "../../navigators/DemoNavigator"
 import { colors, spacing } from "../../theme"
 import { useSafeAreaInsetsStyle } from "../../utils/useSafeAreaInsetsStyle"
@@ -75,7 +74,7 @@ const NativeListItem: FC<DemoListItem> = ({ item, sectionIndex, handleScroll }) 
           key={`section${sectionIndex}-${u}`}
           onPress={() => handleScroll(sectionIndex, index + 1)}
           text={u}
-          rightIcon={isRTL ? "caretLeft" : "caretRight"}
+          leftIcon={"caretLeft"}
         />
       ))}
     </View>
@@ -164,7 +163,7 @@ export const DemoShowroomScreen: FC<DemoTabScreenProps<"DemoShowroom">> =
         ref={drawerRef}
         drawerWidth={Platform.select({ default: 326, web: Dimensions.get("window").width * 0.3 })}
         drawerType={"slide"}
-        drawerPosition={isRTL ? "right" : "left"}
+        drawerPosition={"right"}
         overlayColor={open ? colors.palette.overlay20 : "transparent"}
         onDrawerSlide={(drawerProgress) => {
           progress.value = open ? 1 - drawerProgress : drawerProgress
@@ -198,8 +197,13 @@ export const DemoShowroomScreen: FC<DemoTabScreenProps<"DemoShowroom">> =
           </View>
         )}
       >
-        <Screen preset="fixed" safeAreaEdges={["top"]} contentContainerStyle={$screenContainer}>
-          <DrawerIconButton onPress={toggleDrawer} {...{ open, progress }} />
+        <Screen preset="fixed" contentContainerStyle={$screenContainer}>
+          <Header
+            title="AMC Goob Corp"
+            RightActionComponent={
+              <DrawerIconButton onPress={toggleDrawer} {...{ open, progress }} />
+            }
+          />
 
           <SectionList
             ref={listRef}
@@ -278,5 +282,3 @@ const $demoItemDescription: TextStyle = {
 const $demoUseCasesSpacer: ViewStyle = {
   paddingBottom: spacing.huge,
 }
-
-// @demo remove-file

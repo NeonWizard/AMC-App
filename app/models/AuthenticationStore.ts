@@ -3,7 +3,9 @@ import { Instance, SnapshotOut, types } from "mobx-state-tree"
 export const AuthenticationStoreModel = types
   .model("AuthenticationStore")
   .props({
-    authToken: types.maybe(types.string),
+    // TODO: Auth
+    // authToken: types.maybe(types.string),
+    authToken: "heyy lol",
     authEmail: "",
     authPassword: "",
   })
@@ -57,5 +59,3 @@ export const AuthenticationStoreModel = types
 
 export interface AuthenticationStore extends Instance<typeof AuthenticationStoreModel> {}
 export interface AuthenticationStoreSnapshot extends SnapshotOut<typeof AuthenticationStoreModel> {}
-
-// @demo remove-file
