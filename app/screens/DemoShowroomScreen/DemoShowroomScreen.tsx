@@ -12,10 +12,12 @@ import {
 import { DrawerLayout, DrawerState } from "react-native-gesture-handler"
 import { useSharedValue, withTiming } from "react-native-reanimated"
 import { Card, Header, Screen, Text } from "../../components"
+import { Showtime, ShowtimeModel } from "../../models/Showtime"
 import { DemoTabScreenProps } from "../../navigators/DemoNavigator"
 import { colors, spacing } from "../../theme"
 import { useSafeAreaInsetsStyle } from "../../utils/useSafeAreaInsetsStyle"
 import { DrawerIconButton } from "./DrawerIconButton"
+import { ShowtimeCard } from "./ShowtimeCard"
 
 const logo = require("../../../assets/images/logo.png")
 
@@ -69,14 +71,17 @@ const SidebarSectionElement: FC<SidebarSection> = ({ name, options }) => {
   )
 }
 
-const Showtimes = [
-  {
+const Showtimes: Showtime[] = []
+
+Showtimes.push(
+  ShowtimeModel.create({
     title: "Matrix 8",
-    startTime: Date.now(),
-    endTime: Date.now(),
+    startTime: new Date(),
+    endTime: new Date(),
     auditorium: 7,
-  },
-]
+    description: "",
+  }),
+)
 
 export const DemoShowroomScreen: FC<DemoTabScreenProps<"DemoShowroom">> =
   function DemoShowroomScreen(_props) {
@@ -165,7 +170,7 @@ export const DemoShowroomScreen: FC<DemoTabScreenProps<"DemoShowroom">> =
             <View>
               <FlatList
                 data={Showtimes}
-                renderItem={({ item }) => <Card content={item.title}>{item.title}</Card>}
+                renderItem={({ item }) => <ShowtimeCard showtime={item}></ShowtimeCard>}
                 keyExtractor={(item) => `${item.title}-${item.startTime}-${item.auditorium}`}
               ></FlatList>
             </View>
