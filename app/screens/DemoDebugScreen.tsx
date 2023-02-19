@@ -1,140 +1,283 @@
-import React, { FC } from "react"
-import * as Application from "expo-application"
-import { Linking, Platform, TextStyle, View, ViewStyle } from "react-native"
-import { Button, ListItem, Screen, Text } from "../components"
-import { DemoTabScreenProps } from "../navigators/DemoNavigator"
+import { Link, RouteProp, useRoute } from "@react-navigation/native"
+import React, { FC, ReactElement, useEffect, useRef, useState } from "react"
+import {
+  Dimensions,
+  FlatList,
+  Image,
+  ImageStyle,
+  Platform,
+  SectionList,
+  TextStyle,
+  View,
+  ViewStyle,
+} from "react-native"
+import { DrawerLayout, DrawerState } from "react-native-gesture-handler"
+import { useSharedValue, withTiming } from "react-native-reanimated"
+import { Header, ListItem, Screen, Text } from "../components"
+import { DemoTabParamList, DemoTabScreenProps } from "../navigators/DemoNavigator"
 import { colors, spacing } from "../theme"
-import { isRTL } from "../i18n"
-import { useStores } from "../models"
+import { useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
+import * as Demos from "./DemoShowroomScreen/demos"
+import { DrawerIconButton } from "./DemoShowroomScreen/DrawerIconButton"
 
-function openLinkInBrowser(url: string) {
-  Linking.canOpenURL(url).then((canOpen) => canOpen && Linking.openURL(url))
+const logo = require("../../assets/images/logo.png")
+
+export interface Demo {
+  name: string
+  description: string
+  data: ReactElement[]
 }
 
-export const DemoDebugScreen: FC<DemoTabScreenProps<"DemoDebug">> = function DemoDebugScreen(
-  _props,
-) {
-  const {
-    authenticationStore: { logout },
-  } = useStores()
+interface DemoListItem {
+  item: { name: string; useCases: string[] }
+  sectionIndex: number
+  handleScroll?: (sectionIndex: number, itemIndex?: number) => void
+}
 
-  const usingHermes = typeof HermesInternal === "object" && HermesInternal !== null
+const slugify = (str) =>
+  str
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
 
-  const demoReactotron = React.useMemo(
-    () => async () => {
-      console.tron.display({
-        name: "DISPLAY",
-        value: {
-          appId: Application.applicationId,
-          appName: Application.applicationName,
-          appVersion: Application.nativeApplicationVersion,
-          appBuildVersion: Application.nativeBuildVersion,
-          hermesEnabled: usingHermes,
-        },
-        important: true,
-      })
-    },
-    [],
-  )
+const WebListItem: FC<DemoListItem> = ({ item, sectionIndex }) => {
+  const sectionSlug = item.name.toLowerCase()
 
   return (
-    <Screen preset="scroll" safeAreaEdges={["top"]} contentContainerStyle={$container}>
-      <Text
-        style={$reportBugsLink}
-        tx="demoDebugScreen.reportBugs"
-        onPress={() => openLinkInBrowser("https://github.com/infinitered/ignite/issues")}
-      />
-      <Text style={$title} preset="heading" tx="demoDebugScreen.title" />
-      <View style={$itemsContainer}>
-        <ListItem
-          LeftComponent={
-            <View style={$item}>
-              <Text preset="bold">App Id</Text>
-              <Text>{Application.applicationId}</Text>
-            </View>
-          }
-        />
-        <ListItem
-          LeftComponent={
-            <View style={$item}>
-              <Text preset="bold">App Name</Text>
-              <Text>{Application.applicationName}</Text>
-            </View>
-          }
-        />
-        <ListItem
-          LeftComponent={
-            <View style={$item}>
-              <Text preset="bold">App Version</Text>
-              <Text>{Application.nativeApplicationVersion}</Text>
-            </View>
-          }
-        />
-        <ListItem
-          LeftComponent={
-            <View style={$item}>
-              <Text preset="bold">App Build Version</Text>
-              <Text>{Application.nativeBuildVersion}</Text>
-            </View>
-          }
-        />
-        <ListItem
-          LeftComponent={
-            <View style={$item}>
-              <Text preset="bold">Hermes Enabled</Text>
-              <Text>{String(usingHermes)}</Text>
-            </View>
-          }
-        />
-      </View>
-      <View style={$buttonContainer}>
-        <Button style={$button} tx="demoDebugScreen.reactotron" onPress={demoReactotron} />
-        <Text style={$hint} tx={`demoDebugScreen.${Platform.OS}ReactotronHint` as const} />
-      </View>
-      <View style={$buttonContainer}>
-        <Button style={$button} tx="common.logOut" onPress={logout} />
-      </View>
-    </Screen>
+    <View>
+      <Link to={`/showroom/${sectionSlug}`} style={$menuContainer}>
+        <Text preset="bold">{item.name}</Text>
+      </Link>
+      {item.useCases.map((u) => {
+        const itemSlug = slugify(u)
+
+        return (
+          <Link key={`section${sectionIndex}-${u}`} to={`/showroom/${sectionSlug}/${itemSlug}`}>
+            <Text>{u}</Text>
+          </Link>
+        )
+      })}
+    </View>
   )
 }
 
-const $container: ViewStyle = {
-  paddingTop: spacing.large + spacing.extraLarge,
-  paddingBottom: spacing.huge,
+const NativeListItem: FC<DemoListItem> = ({ item, sectionIndex, handleScroll }) => {
+  return (
+    <View>
+      <Text onPress={() => handleScroll(sectionIndex)} preset="bold" style={$menuContainer}>
+        {item.name}
+      </Text>
+      {item.useCases.map((u, index) => (
+        <ListItem
+          key={`section${sectionIndex}-${u}`}
+          onPress={() => handleScroll(sectionIndex, index + 1)}
+          text={u}
+          leftIcon={"caretLeft"}
+        />
+      ))}
+    </View>
+  )
+}
+
+const ShowroomListItem = Platform.select({ web: WebListItem, default: NativeListItem })
+
+export const DemoDebugScreen: FC<DemoTabScreenProps<"DemoShowroom">> = function DemoDebugScreen(
+  _props,
+) {
+  const [open, setOpen] = useState(false)
+  const timeout = useRef<ReturnType<typeof setTimeout>>()
+  const drawerRef = useRef<DrawerLayout>()
+  const listRef = useRef<SectionList>()
+  const menuRef = useRef<FlatList>()
+  const progress = useSharedValue(0)
+  const route = useRoute<RouteProp<DemoTabParamList, "DemoShowroom">>()
+  const params = route.params
+
+  // handle Web links
+  React.useEffect(() => {
+    if (route.params) {
+      const demoValues = Object.values(Demos)
+      const findSectionIndex = demoValues.findIndex(
+        (x) => x.name.toLowerCase() === params.queryIndex,
+      )
+      let findItemIndex = 0
+      if (params.itemIndex) {
+        try {
+          findItemIndex =
+            demoValues[findSectionIndex].data.findIndex(
+              (u) => slugify(u.props.name) === params.itemIndex,
+            ) + 1
+        } catch (err) {
+          console.error(err)
+        }
+      }
+      handleScroll(findSectionIndex, findItemIndex)
+    }
+  }, [route])
+
+  const toggleDrawer = () => {
+    if (!open) {
+      setOpen(true)
+      drawerRef.current?.openDrawer({ speed: 2 })
+    } else {
+      setOpen(false)
+      drawerRef.current?.closeDrawer({ speed: 2 })
+    }
+  }
+
+  const handleScroll = (sectionIndex: number, itemIndex = 0) => {
+    listRef.current.scrollToLocation({
+      animated: true,
+      itemIndex,
+      sectionIndex,
+    })
+    toggleDrawer()
+  }
+
+  const scrollToIndexFailed = (info: {
+    index: number
+    highestMeasuredFrameIndex: number
+    averageItemLength: number
+  }) => {
+    listRef.current?.getScrollResponder()?.scrollToEnd()
+    timeout.current = setTimeout(
+      () =>
+        listRef.current?.scrollToLocation({
+          animated: true,
+          itemIndex: info.index,
+          sectionIndex: 0,
+        }),
+      50,
+    )
+  }
+
+  useEffect(() => {
+    return () => timeout.current && clearTimeout(timeout.current)
+  }, [])
+
+  const $drawerInsets = useSafeAreaInsetsStyle(["top"])
+
+  return (
+    <DrawerLayout
+      ref={drawerRef}
+      drawerWidth={Platform.select({ default: 326, web: Dimensions.get("window").width * 0.3 })}
+      drawerType={"slide"}
+      drawerPosition={"right"}
+      overlayColor={open ? colors.palette.overlay20 : "transparent"}
+      onDrawerSlide={(drawerProgress) => {
+        progress.value = open ? 1 - drawerProgress : drawerProgress
+      }}
+      onDrawerStateChanged={(newState: DrawerState, drawerWillShow: boolean) => {
+        if (newState === "Settling") {
+          progress.value = withTiming(drawerWillShow ? 1 : 0, {
+            duration: 250,
+          })
+          setOpen(drawerWillShow)
+        }
+      }}
+      renderNavigationView={() => (
+        <View style={[$drawer, $drawerInsets]}>
+          <View style={$logoContainer}>
+            <Image source={logo} style={$logoImage} />
+          </View>
+
+          <FlatList<{ name: string; useCases: string[] }>
+            ref={menuRef}
+            contentContainerStyle={$flatListContentContainer}
+            data={Object.values(Demos).map((d) => ({
+              name: d.name,
+              useCases: d.data.map((u) => u.props.name),
+            }))}
+            keyExtractor={(item) => item.name}
+            renderItem={({ item, index: sectionIndex }) => (
+              <ShowroomListItem {...{ item, sectionIndex, handleScroll }} />
+            )}
+          />
+        </View>
+      )}
+    >
+      <Screen preset="fixed" contentContainerStyle={$screenContainer}>
+        <Header
+          title="AMC Goob Corp"
+          RightActionComponent={<DrawerIconButton onPress={toggleDrawer} {...{ open, progress }} />}
+        />
+
+        <SectionList
+          ref={listRef}
+          contentContainerStyle={$sectionListContentContainer}
+          stickySectionHeadersEnabled={false}
+          sections={Object.values(Demos)}
+          renderItem={({ item }) => item}
+          renderSectionFooter={() => <View style={$demoUseCasesSpacer} />}
+          ListHeaderComponent={
+            <View style={$heading}>
+              <Text preset="heading" tx="demoShowroomScreen.jumpStart" />
+            </View>
+          }
+          onScrollToIndexFailed={scrollToIndexFailed}
+          renderSectionHeader={({ section }) => {
+            return (
+              <View>
+                <Text preset="heading" style={$demoItemName}>
+                  {section.name}
+                </Text>
+                <Text style={$demoItemDescription}>{section.description}</Text>
+              </View>
+            )
+          }}
+        />
+      </Screen>
+    </DrawerLayout>
+  )
+}
+
+const $screenContainer: ViewStyle = {
+  flex: 1,
+}
+
+const $drawer: ViewStyle = {
+  flex: 1,
+}
+
+const $flatListContentContainer: ViewStyle = {
   paddingHorizontal: spacing.large,
 }
 
-const $title: TextStyle = {
+const $sectionListContentContainer: ViewStyle = {
+  paddingHorizontal: spacing.large,
+}
+
+const $heading: ViewStyle = {
+  marginBottom: spacing.massive,
+}
+
+const $logoImage: ImageStyle = {
+  height: 42,
+  width: 77,
+}
+
+const $logoContainer: ViewStyle = {
+  alignSelf: "flex-start",
+  height: 56,
+  paddingHorizontal: spacing.large,
+}
+
+const $menuContainer: ViewStyle = {
+  paddingBottom: spacing.extraSmall,
+  paddingTop: spacing.large,
+}
+
+const $demoItemName: TextStyle = {
+  fontSize: 24,
+  marginBottom: spacing.medium,
+}
+
+const $demoItemDescription: TextStyle = {
   marginBottom: spacing.huge,
 }
 
-const $reportBugsLink: TextStyle = {
-  color: colors.tint,
-  marginBottom: spacing.large,
-  alignSelf: isRTL ? "flex-start" : "flex-end",
+const $demoUseCasesSpacer: ViewStyle = {
+  paddingBottom: spacing.huge,
 }
-
-const $item: ViewStyle = {
-  marginBottom: spacing.medium,
-}
-
-const $itemsContainer: ViewStyle = {
-  marginBottom: spacing.extraLarge,
-}
-
-const $button: ViewStyle = {
-  marginBottom: spacing.extraSmall,
-}
-
-const $buttonContainer: ViewStyle = {
-  marginBottom: spacing.medium,
-}
-
-const $hint: TextStyle = {
-  color: colors.palette.neutral600,
-  fontSize: 12,
-  lineHeight: 15,
-  paddingBottom: spacing.large,
-}
-
-// @demo remove-file

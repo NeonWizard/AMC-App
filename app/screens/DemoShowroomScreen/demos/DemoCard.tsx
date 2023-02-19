@@ -2,9 +2,9 @@
 import React from "react"
 import { AutoImage, Button, Card, Icon } from "../../../components"
 import { colors, spacing } from "../../../theme"
-import { Demo } from "../DemoShowroomScreen"
 import { DemoDivider } from "../DemoDivider"
 import { DemoUseCase } from "../DemoUseCase"
+import { Demo } from "./Demo"
 
 export const DemoCard: Demo = {
   name: "Card",
