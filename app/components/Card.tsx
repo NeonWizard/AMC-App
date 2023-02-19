@@ -79,6 +79,10 @@ interface CardProps extends TouchableOpacityProps {
    */
   contentStyle?: StyleProp<TextStyle>
   /**
+   * Style overrides for alignment wrapper.
+   */
+  alignmentWrapperStyle?: StyleProp<TextStyle>
+  /**
    * Pass any additional props directly to the content Text component.
    */
   ContentTextProps?: TextProps
@@ -139,6 +143,7 @@ export function Card(props: CardProps) {
     RightComponent,
     verticalAlignment = "top",
     style: $containerStyleOverride,
+    alignmentWrapperStyle: $alignmentWrapperStyleOverride,
     contentStyle: $contentStyleOverride,
     headingStyle: $headingStyleOverride,
     footerStyle: $footerStyleOverride,
@@ -182,6 +187,7 @@ export function Card(props: CardProps) {
     { justifyContent: $alignmentWrapperFlexOptions[verticalAlignment] },
     LeftComponent && { marginStart: spacing.medium },
     RightComponent && { marginEnd: spacing.medium },
+    $alignmentWrapperStyleOverride,
   ]
 
   return (

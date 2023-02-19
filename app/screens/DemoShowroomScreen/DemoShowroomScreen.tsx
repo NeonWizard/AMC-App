@@ -1,8 +1,17 @@
 import React, { FC, useEffect, useRef, useState } from "react"
-import { Dimensions, FlatList, Image, ImageStyle, Platform, View, ViewStyle } from "react-native"
+import {
+  Dimensions,
+  FlatList,
+  Image,
+  ImageStyle,
+  Platform,
+  TextStyle,
+  View,
+  ViewStyle,
+} from "react-native"
 import { DrawerLayout, DrawerState } from "react-native-gesture-handler"
 import { useSharedValue, withTiming } from "react-native-reanimated"
-import { Header, Screen, Text } from "../../components"
+import { Card, Header, Screen, Text } from "../../components"
 import { DemoTabScreenProps } from "../../navigators/DemoNavigator"
 import { colors, spacing } from "../../theme"
 import { useSafeAreaInsetsStyle } from "../../utils/useSafeAreaInsetsStyle"
@@ -59,6 +68,15 @@ const SidebarSectionElement: FC<SidebarSection> = ({ name, options }) => {
     </View>
   )
 }
+
+const Showtimes = [
+  {
+    title: "Matrix 8",
+    startTime: Date.now(),
+    endTime: Date.now(),
+    auditorium: 7,
+  },
+]
 
 export const DemoShowroomScreen: FC<DemoTabScreenProps<"DemoShowroom">> =
   function DemoShowroomScreen(_props) {
@@ -129,10 +147,28 @@ export const DemoShowroomScreen: FC<DemoTabScreenProps<"DemoShowroom">> =
             style={$heading}
           />
           <View style={$sectionListContentContainer}>
-            <Text>Main Content</Text>
-            <Text>Main Content</Text>
-            <Text>Main Content</Text>
-            <Text>Main Content</Text>
+            {/* MAIN CONTENT */}
+            <Card
+              preset="reversed"
+              ContentComponent={
+                <Text weight="semiBold" size="xxl" style={$trafficText}>
+                  HIGH
+                </Text>
+              }
+              verticalAlignment="center"
+              style={$trafficContainerStyle}
+              alignmentWrapperStyle={$trafficContainerAlignmentStyle}
+            />
+            <Text preset="heading" style={$headerText}>
+              Upcoming Showtimes
+            </Text>
+            <View>
+              <FlatList
+                data={Showtimes}
+                renderItem={({ item }) => <Card content={item.title}>{item.title}</Card>}
+                keyExtractor={(item) => `${item.title}-${item.startTime}-${item.auditorium}`}
+              ></FlatList>
+            </View>
           </View>
         </Screen>
       </DrawerLayout>
@@ -174,4 +210,22 @@ const $logoContainer: ViewStyle = {
 const $menuContainer: ViewStyle = {
   paddingBottom: spacing.extraSmall,
   paddingTop: spacing.large,
+}
+
+const $headerText: TextStyle = {
+  fontSize: 24,
+  marginBottom: spacing.medium,
+  marginTop: spacing.medium,
+}
+
+const $trafficContainerStyle: TextStyle = {
+  backgroundColor: "red",
+}
+
+const $trafficText: TextStyle = {
+  color: "white",
+}
+
+const $trafficContainerAlignmentStyle: TextStyle = {
+  alignItems: "center",
 }
