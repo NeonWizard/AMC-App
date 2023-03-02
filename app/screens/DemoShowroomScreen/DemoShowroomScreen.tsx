@@ -73,12 +73,27 @@ const SidebarSectionElement: FC<SidebarSection> = ({ name, options }) => {
 
 const Showtimes: Showtime[] = []
 
+// Should be sorted by end time
 Showtimes.push(
   ShowtimeModel.create({
     title: "Matrix 8",
-    startTime: new Date(),
-    endTime: new Date(),
+    startTime: new Date().setMinutes(new Date().getMinutes() - 35),
+    endTime: new Date().setMinutes(new Date().getMinutes() + 79),
     auditorium: 7,
+    description: "",
+  }),
+  ShowtimeModel.create({
+    title: "Why North Korea is Great",
+    startTime: new Date().setMinutes(new Date().getMinutes() - 14),
+    endTime: new Date().setMinutes(new Date().getMinutes() + 123),
+    auditorium: 12,
+    description: "hallo eviryone north korea",
+  }),
+  ShowtimeModel.create({
+    title: "Crasy: Loco",
+    startTime: new Date().setMinutes(new Date().getMinutes() + 7),
+    endTime: new Date().setMinutes(new Date().getMinutes() + 140),
+    auditorium: 4,
     description: "",
   }),
 )
@@ -170,7 +185,10 @@ export const DemoShowroomScreen: FC<DemoTabScreenProps<"DemoShowroom">> =
             <View>
               <FlatList
                 data={Showtimes}
-                renderItem={({ item }) => <ShowtimeCard showtime={item}></ShowtimeCard>}
+                style={$showtimeList}
+                renderItem={({ item }) => (
+                  <ShowtimeCard showtime={item} style={$showtimeCard}></ShowtimeCard>
+                )}
                 keyExtractor={(item) => `${item.title}-${item.startTime}-${item.auditorium}`}
               ></FlatList>
             </View>
@@ -233,4 +251,12 @@ const $trafficText: TextStyle = {
 
 const $trafficContainerAlignmentStyle: TextStyle = {
   alignItems: "center",
+}
+
+const $showtimeCard: TextStyle = {
+  marginBottom: spacing.small,
+}
+
+const $showtimeList: TextStyle = {
+  backgroundColor: colors.background,
 }

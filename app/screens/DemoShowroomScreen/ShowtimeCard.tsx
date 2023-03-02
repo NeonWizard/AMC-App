@@ -1,7 +1,7 @@
 import * as React from "react"
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native"
 import { observer } from "mobx-react-lite"
-import { colors, typography } from "../../theme"
+import { colors, spacing } from "../../theme"
 import { Text } from "../../components/Text"
 import { Showtime } from "../../models/Showtime"
 import { Card } from "../../components"
@@ -15,12 +15,20 @@ export interface ShowtimeCardProps {
   showtime: Showtime
 }
 
-/**
- * Describe your component here
- */
 export const ShowtimeCard = observer(function ShowtimeCard(props: ShowtimeCardProps) {
   const { style, showtime } = props
   const $styles = [$container, style]
+
+  const getTimeRemaining = () => {
+    const seconds = (showtime.endTime.getTime() - new Date().getTime()) / 1000
+
+    const h = Math.floor(seconds / 3600)
+    const m = Math.floor((seconds % 3600) / 60)
+
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`
+  }
+
+  // TODO: Update time remaining every minute
 
   return (
     <Card
@@ -28,48 +36,25 @@ export const ShowtimeCard = observer(function ShowtimeCard(props: ShowtimeCardPr
       verticalAlignment="force-footer-bottom"
       HeadingComponent={
         <View style={$metadata}>
-          <Text
-            style={$metadataText}
-            size="xxs"
-            accessibilityLabel={episode.datePublished.accessibilityLabel}
-          >
-            {episode.datePublished.textLabel}
+          <Text weight="semiBold" style={$metadataText} size="sm">
+            {showtime.title}
           </Text>
-          <Text
-            style={$metadataText}
-            size="xxs"
-            accessibilityLabel={episode.duration.accessibilityLabel}
-          >
-            {episode.duration.textLabel}
+          <Text style={$metadataText} size="sm">
+            {getTimeRemaining()} left
           </Text>
         </View>
       }
-      content={`${episode.parsedTitleAndSubtitle.title} - ${episode.parsedTitleAndSubtitle.subtitle}`}
-      {...accessibilityHintProps}
-      RightComponent={<Image source={imageUri} style={$itemThumbnail} />}
       FooterComponent={
-        <Button
-          onPress={handlePressFavorite}
-          onLongPress={handlePressFavorite}
-          style={[$favoriteButton, isFavorite && $unFavoriteButton]}
-          accessibilityLabel={
-            isFavorite
-              ? translate("demoPodcastListScreen.accessibility.unfavoriteIcon")
-              : translate("demoPodcastListScreen.accessibility.favoriteIcon")
-          }
-          LeftAccessory={ButtonLeftAccessory}
-        >
-          <Text
-            size="xxs"
-            accessibilityLabel={episode.duration.accessibilityLabel}
-            weight="medium"
-            text={
-              isFavorite
-                ? translate("demoPodcastListScreen.unfavoriteButton")
-                : translate("demoPodcastListScreen.favoriteButton")
-            }
-          />
-        </Button>
+        <View style={$footer}>
+          <Text style={$footerText} size="xxs">
+            <Text>Start: </Text>
+            {showtime.startString}
+          </Text>
+          <Text style={$footerText} size="xxs">
+            <Text>End: </Text>
+            {showtime.endString}
+          </Text>
+        </View>
       }
     />
   )
@@ -77,4 +62,30 @@ export const ShowtimeCard = observer(function ShowtimeCard(props: ShowtimeCardPr
 
 const $container: ViewStyle = {
   justifyContent: "center",
+}
+
+const $metadata: TextStyle = {
+  color: colors.textDim,
+  marginTop: spacing.extraSmall,
+  flexDirection: "row",
+  justifyContent: "space-between",
+  marginStart: spacing.tiny,
+}
+
+const $metadataText: TextStyle = {
+  color: colors.text,
+  marginEnd: spacing.medium,
+  marginBottom: spacing.extraSmall,
+}
+
+const $footer: TextStyle = {
+  color: colors.textDim,
+  flexDirection: "row",
+}
+
+const $footerText: TextStyle = {
+  color: colors.text,
+  marginEnd: spacing.small,
+  marginStart: spacing.tiny,
+  marginBottom: spacing.extraSmall,
 }
