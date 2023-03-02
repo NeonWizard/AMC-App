@@ -34,6 +34,9 @@ export interface ApiFeedResponse {
   items: EpisodeItem[]
 }
 
+// TODO
+export interface AMCAPIResponse {}
+
 /**
  * The options used to configure apisauce.
  */

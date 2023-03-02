@@ -213,7 +213,7 @@ export const DemoDebugScreen: FC<DemoTabScreenProps<"DemoShowroom">> = function 
           renderSectionFooter={() => <View style={$demoUseCasesSpacer} />}
           ListHeaderComponent={
             <View style={$heading}>
-              <Text preset="heading" tx="demoShowroomScreen.jumpStart" />
+              <Text preset="heading">Components</Text>
             </View>
           }
           onScrollToIndexFailed={scrollToIndexFailed}
@@ -250,7 +250,7 @@ const $sectionListContentContainer: ViewStyle = {
 }
 
 const $heading: ViewStyle = {
-  marginBottom: spacing.massive,
+  marginBottom: spacing.large,
 }
 
 const $logoImage: ImageStyle = {

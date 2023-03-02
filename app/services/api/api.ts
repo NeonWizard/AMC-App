@@ -17,6 +17,7 @@ import type {
   ApiFeedResponse, // @demo remove-current-line
 } from "./api.types"
 import type { EpisodeSnapshotIn } from "../../models/Episode" // @demo remove-current-line
+import { ShowtimeSnapshotIn } from "../../models/Showtime"
 
 /**
  * Configuring the apisauce instance.
@@ -67,6 +68,7 @@ export class Api {
     // transform the data into the format we are expecting
     try {
       const rawData = response.data
+      console.log(rawData.items)
 
       // This is where we transform the data into the shape we expect for our MST model.
       const episodes: EpisodeSnapshotIn[] = rawData.items.map((raw) => ({
@@ -82,6 +84,69 @@ export class Api {
     }
   }
   // @demo remove-block-end
+
+  async getShowtimes(): Promise<
+    { kind: "ok"; showtimes: ShowtimeSnapshotIn[] } | GeneralApiProblem
+  > {
+    try {
+      // Mock data, TODO
+      const showtimes: ShowtimeSnapshotIn[] = [
+        {
+          title: "goog morning",
+          startTime: new Date().setMinutes(new Date().getMinutes() - 590),
+          endTime: new Date().setMinutes(new Date().getMinutes() - 563),
+          auditorium: 1,
+          description: "",
+        },
+        {
+          title: "What where am I",
+          startTime: new Date().setMinutes(new Date().getMinutes() - 300),
+          endTime: new Date().setMinutes(new Date().getMinutes() - 100),
+          auditorium: 8,
+          description: "",
+        },
+        {
+          title: "Matrix 8",
+          startTime: new Date().setMinutes(new Date().getMinutes() - 35),
+          endTime: new Date().setMinutes(new Date().getMinutes() + 79),
+          auditorium: 7,
+          description: "",
+        },
+        {
+          title: "Why North Korea is Great",
+          startTime: new Date().setMinutes(new Date().getMinutes() - 14),
+          endTime: new Date().setMinutes(new Date().getMinutes() + 123),
+          auditorium: 12,
+          description: "hallo eviryone north korea",
+        },
+        {
+          title: "Crasy: Loco",
+          startTime: new Date().setMinutes(new Date().getMinutes() + 7),
+          endTime: new Date().setMinutes(new Date().getMinutes() + 140),
+          auditorium: 4,
+          description: "",
+        },
+        {
+          title: "Matrix 8",
+          startTime: new Date().setMinutes(new Date().getMinutes() + 109),
+          endTime: new Date().setMinutes(new Date().getMinutes() + 253),
+          auditorium: 7,
+          description: "",
+        },
+        {
+          title: "Aliens with lazerz",
+          startTime: new Date().setMinutes(new Date().getMinutes() + 450),
+          endTime: new Date().setMinutes(new Date().getMinutes() + 599),
+          auditorium: 3,
+          description: "these aliens got big laserz mann",
+        },
+      ]
+
+      return { kind: "ok", showtimes }
+    } catch (e) {
+      return { kind: "bad-data" }
+    }
+  }
 }
 
 // Singleton instance of the API for convenience
