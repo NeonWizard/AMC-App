@@ -13,6 +13,8 @@ export interface ShowtimeCardProps {
   style?: StyleProp<ViewStyle>
 
   showtime: Showtime
+
+  crossedOff: boolean
 }
 
 export const ShowtimeCard = observer(function ShowtimeCard(props: ShowtimeCardProps) {
@@ -36,7 +38,7 @@ export const ShowtimeCard = observer(function ShowtimeCard(props: ShowtimeCardPr
 
   return (
     <Card
-      style={$styles}
+      style={[$styles, $crossedOff]}
       verticalAlignment="force-footer-bottom"
       HeadingComponent={
         <View style={$metadata}>
@@ -106,4 +108,8 @@ const $footerText: TextStyle = {
 
 const $footerAuditorium: TextStyle = {
   marginEnd: spacing.tiny,
+}
+
+const $crossedOff: TextStyle = {
+  color: "yellow",
 }
