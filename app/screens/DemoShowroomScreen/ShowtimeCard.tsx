@@ -50,13 +50,18 @@ export const ShowtimeCard = observer(function ShowtimeCard(props: ShowtimeCardPr
       }
       FooterComponent={
         <View style={$footer}>
-          <Text style={$footerText} size="xxs">
-            <Text>Start: </Text>
-            {showtime.startString}
-          </Text>
-          <Text style={$footerText} size="xxs">
-            <Text>End: </Text>
-            {showtime.endString}
+          <View style={$footerLeft}>
+            <Text style={$footerText} size="xxs">
+              <Text>Start: </Text>
+              {showtime.startString}
+            </Text>
+            <Text style={$footerText} size="xxs">
+              <Text>End: </Text>
+              {showtime.endString}
+            </Text>
+          </View>
+          <Text weight="semiBold" style={$footerAuditorium} size="xs">
+            {showtime.auditorium}
           </Text>
         </View>
       }
@@ -85,6 +90,11 @@ const $metadataText: TextStyle = {
 const $footer: TextStyle = {
   color: colors.textDim,
   flexDirection: "row",
+  justifyContent: "space-between",
+}
+
+const $footerLeft: TextStyle = {
+  flexDirection: "row",
 }
 
 const $footerText: TextStyle = {
@@ -92,4 +102,8 @@ const $footerText: TextStyle = {
   marginEnd: spacing.small,
   marginStart: spacing.tiny,
   marginBottom: spacing.extraSmall,
+}
+
+const $footerAuditorium: TextStyle = {
+  marginEnd: spacing.tiny,
 }
