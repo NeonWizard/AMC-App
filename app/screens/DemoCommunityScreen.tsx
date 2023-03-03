@@ -33,7 +33,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
     }
 
     return (
-      <Screen preset="scroll" contentContainerStyle={$container} safeAreaEdges={["top"]}>
+      <Screen preset="fixed" contentContainerStyle={$container} safeAreaEdges={["top"]}>
         <FlatList<Showtime>
           data={showtimeStore.showtimesForList}
           // extraData={episodeStore.favorites.length + episodeStore.episodes.length}
