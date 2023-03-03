@@ -213,7 +213,12 @@ export const DemoDebugScreen: FC<DemoTabScreenProps<"DemoShowroom">> = function 
           renderSectionFooter={() => <View style={$demoUseCasesSpacer} />}
           ListHeaderComponent={
             <View style={$heading}>
-              <Text preset="heading">Components</Text>
+              <Text preset="heading" style={$title}>
+                Components
+              </Text>
+              <Text style={$tagline}>
+                This page lists the available components in the boilerplate for viewing purposes.
+              </Text>
             </View>
           }
           onScrollToIndexFailed={scrollToIndexFailed}
@@ -253,6 +258,10 @@ const $heading: ViewStyle = {
   marginBottom: spacing.large,
 }
 
+const $title: TextStyle = {
+  marginBottom: spacing.small,
+}
+
 const $logoImage: ImageStyle = {
   height: 42,
   width: 77,
@@ -280,4 +289,8 @@ const $demoItemDescription: TextStyle = {
 
 const $demoUseCasesSpacer: ViewStyle = {
   paddingBottom: spacing.huge,
+}
+
+const $tagline: TextStyle = {
+  marginBottom: spacing.small,
 }
