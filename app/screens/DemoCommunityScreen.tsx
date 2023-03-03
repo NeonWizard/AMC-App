@@ -1,4 +1,5 @@
 import { isRTL } from "expo-localization"
+import { observer } from "mobx-react-lite"
 import React, { FC, useEffect } from "react"
 import { ActivityIndicator, FlatList, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
 import { EmptyState, Screen, Text, Toggle } from "../components"
@@ -9,7 +10,7 @@ import { spacing } from "../theme"
 import { delay } from "../utils/delay"
 import { ShowtimeCard } from "./DemoShowroomScreen/ShowtimeCard"
 
-export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
+export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> = observer(
   function DemoCommunityScreen(_props) {
     const { showtimeStore } = useStores()
 
@@ -83,7 +84,8 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
         />
       </Screen>
     )
-  }
+  },
+)
 
 const $container: ViewStyle = {
   flex: 1,
