@@ -62,7 +62,7 @@ const SidebarSectionElement: FC<SidebarSection> = ({ name, options }) => {
       </View>
       {options.map((option) => {
         return (
-          <Text key={`${name}-${option.name}`} onPress={option.callback}>
+          <Text key={`${name}-${option.name}`} onPress={option.callback} style={$menuOption}>
             {option.name}
           </Text>
         )
@@ -259,4 +259,8 @@ const $showtimeCard: TextStyle = {
 
 const $showtimeList: TextStyle = {
   backgroundColor: colors.background,
+}
+
+const $menuOption: TextStyle = {
+  marginBottom: spacing.micro,
 }

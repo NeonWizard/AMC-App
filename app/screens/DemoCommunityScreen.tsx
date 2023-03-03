@@ -1,3 +1,4 @@
+import SegmentedControl from "@react-native-segmented-control/segmented-control"
 import { isRTL } from "expo-localization"
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect } from "react"
@@ -16,6 +17,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> = obse
 
     const [refreshing, setRefreshing] = React.useState(false)
     const [isLoading, setIsLoading] = React.useState(false)
+    const [sortType, setSortType] = React.useState(0)
 
     // initially, kick off a background refresh without the refreshing UI
     useEffect(() => {
@@ -78,6 +80,17 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> = obse
                   />
                 </View>
               )}
+              {showtimeStore.showtimesForList.length > 0 && (
+                <SegmentedControl
+                  style={$segmentStyle}
+                  values={["Start Time", "End Time", "Movie Name"]}
+                  selectedIndex={sortType}
+                  tintColor="#911"
+                  onChange={(event) => {
+                    setSortType(event.nativeEvent.selectedSegmentIndex)
+                  }}
+                ></SegmentedControl>
+              )}
             </View>
           }
           renderItem={({ item }) => <ShowtimeCard showtime={item} style={$showtimeCard} />}
@@ -119,4 +132,8 @@ const $labelStyle: TextStyle = {
 
 const $showtimeCard: TextStyle = {
   marginBottom: spacing.tiny,
+}
+
+const $segmentStyle: TextStyle = {
+  marginTop: spacing.medium,
 }
