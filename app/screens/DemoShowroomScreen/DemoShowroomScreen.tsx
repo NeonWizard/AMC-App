@@ -242,7 +242,7 @@ const $headerText: TextStyle = {
 }
 
 const $trafficContainerStyle: TextStyle = {
-  backgroundColor: "red",
+  backgroundColor: "#d33",
 }
 
 const $trafficText: TextStyle = {
