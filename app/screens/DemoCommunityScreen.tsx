@@ -2,14 +2,30 @@ import SegmentedControl from "@react-native-segmented-control/segmented-control"
 import { isRTL } from "expo-localization"
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect } from "react"
-import { ActivityIndicator, FlatList, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
-import { EmptyState, Screen, Text, Toggle } from "../components"
+import {
+  ActivityIndicator,
+  Dimensions,
+  FlatList,
+  Image,
+  ImageStyle,
+  Platform,
+  TextStyle,
+  View,
+  ViewStyle,
+} from "react-native"
+import { DrawerLayout, DrawerState } from "react-native-gesture-handler"
+import { useSharedValue, withTiming } from "react-native-reanimated"
+import { EmptyState, Header, Screen, Text, Toggle } from "../components"
 import { useStores } from "../models"
 import { Showtime } from "../models/Showtime"
 import { DemoTabScreenProps } from "../navigators/DemoNavigator"
-import { spacing } from "../theme"
+import { colors, spacing } from "../theme"
 import { delay } from "../utils/delay"
+import { useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
+import { DrawerIconButton } from "./DemoShowroomScreen/DrawerIconButton"
 import { ShowtimeCard } from "./DemoShowroomScreen/ShowtimeCard"
+
+const logo = require("../../assets/images/logo.png")
 
 export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> = observer(
   function DemoCommunityScreen(_props) {
@@ -18,6 +34,10 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> = obse
     const [refreshing, setRefreshing] = React.useState(false)
     const [isLoading, setIsLoading] = React.useState(false)
     const [sortType, setSortType] = React.useState(0)
+    const [open, setOpen] = React.useState(false)
+    const progress = useSharedValue(0)
+
+    const drawerRef = React.useRef<DrawerLayout>()
 
     // initially, kick off a background refresh without the refreshing UI
     useEffect(() => {
@@ -35,67 +55,112 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> = obse
       setRefreshing(false)
     }
 
+    const toggleDrawer = () => {
+      if (!open) {
+        setOpen(true)
+        drawerRef.current?.openDrawer({ speed: 2 })
+      } else {
+        setOpen(false)
+        drawerRef.current?.closeDrawer({ speed: 2 })
+      }
+    }
+
+    const $drawerInsets = useSafeAreaInsetsStyle(["top"])
+
     return (
-      <Screen preset="fixed" contentContainerStyle={$container} safeAreaEdges={["top"]}>
-        <FlatList<Showtime>
-          data={showtimeStore.showtimesForList}
-          // extraData={episodeStore.favorites.length + episodeStore.episodes.length}
-          contentContainerStyle={$flatListContentContainer}
-          refreshing={refreshing}
-          onRefresh={manualRefresh}
-          ListEmptyComponent={
-            isLoading ? (
-              <ActivityIndicator />
-            ) : (
-              <EmptyState
-                preset="generic"
-                style={$emptyState}
-                heading={showtimeStore.upcomingOnly ? "This looks a bit empty" : undefined}
-                content={
-                  showtimeStore.upcomingOnly
-                    ? "There are no more upcoming showtimes today! Good job! :)"
-                    : undefined
-                }
-                button={showtimeStore.upcomingOnly ? null : undefined}
-                buttonOnPress={manualRefresh}
-                imageStyle={$emptyStateImage}
-                ImageProps={{ resizeMode: "contain" }}
-              />
-            )
+      <DrawerLayout
+        ref={drawerRef}
+        drawerWidth={Platform.select({ default: 326, web: Dimensions.get("window").width * 0.3 })}
+        drawerType={"slide"}
+        drawerPosition={"right"}
+        overlayColor={open ? colors.palette.overlay20 : "transparent"}
+        onDrawerSlide={(drawerProgress) => {
+          progress.value = open ? 1 - drawerProgress : drawerProgress
+        }}
+        onDrawerStateChanged={(newState: DrawerState, drawerWillShow: boolean) => {
+          if (newState === "Settling") {
+            progress.value = withTiming(drawerWillShow ? 1 : 0, {
+              duration: 250,
+            })
+            setOpen(drawerWillShow)
           }
-          ListHeaderComponent={
-            <View style={$heading}>
-              <Text preset="heading">Usher Schedule</Text>
-              {(showtimeStore.upcomingOnly || showtimeStore.showtimesForList.length > 0) && (
-                <View style={$toggle}>
-                  <Toggle
-                    value={showtimeStore.upcomingOnly}
-                    onValueChange={() =>
-                      showtimeStore.setProp("upcomingOnly", !showtimeStore.upcomingOnly)
-                    }
-                    variant="switch"
-                    label="Only Show Upcoming"
-                    labelPosition="left"
-                    labelStyle={$labelStyle}
-                  />
-                </View>
-              )}
-              {showtimeStore.showtimesForList.length > 0 && (
-                <SegmentedControl
-                  style={$segmentStyle}
-                  values={["Start Time", "End Time", "Movie Name"]}
-                  selectedIndex={sortType}
-                  tintColor="#911"
-                  onChange={(event) => {
-                    setSortType(event.nativeEvent.selectedSegmentIndex)
-                  }}
-                ></SegmentedControl>
-              )}
+        }}
+        renderNavigationView={() => (
+          <View style={[$drawer, $drawerInsets]}>
+            <View style={$logoContainer}>
+              <Image source={logo} style={$logoImage} />
             </View>
-          }
-          renderItem={({ item }) => <ShowtimeCard showtime={item} style={$showtimeCard} />}
-        />
-      </Screen>
+          </View>
+        )}
+      >
+        <Screen preset="fixed" contentContainerStyle={$container}>
+          <Header
+            title="AMC Goob Corp"
+            RightActionComponent={
+              <DrawerIconButton onPress={toggleDrawer} {...{ open, progress }} />
+            }
+            style={$heading}
+          />
+          <FlatList<Showtime>
+            data={showtimeStore.showtimesForList}
+            // extraData={episodeStore.favorites.length + episodeStore.episodes.length}
+            contentContainerStyle={$flatListContentContainer}
+            refreshing={refreshing}
+            onRefresh={manualRefresh}
+            ListEmptyComponent={
+              isLoading ? (
+                <ActivityIndicator />
+              ) : (
+                <EmptyState
+                  preset="generic"
+                  style={$emptyState}
+                  heading={showtimeStore.upcomingOnly ? "This looks a bit empty" : undefined}
+                  content={
+                    showtimeStore.upcomingOnly
+                      ? "There are no more upcoming showtimes today! Good job! :)"
+                      : undefined
+                  }
+                  button={showtimeStore.upcomingOnly ? null : undefined}
+                  buttonOnPress={manualRefresh}
+                  imageStyle={$emptyStateImage}
+                  ImageProps={{ resizeMode: "contain" }}
+                />
+              )
+            }
+            ListHeaderComponent={
+              <View style={$heading}>
+                <Text preset="heading">Usher Schedule</Text>
+                {(showtimeStore.upcomingOnly || showtimeStore.showtimesForList.length > 0) && (
+                  <View style={$toggle}>
+                    <Toggle
+                      value={showtimeStore.upcomingOnly}
+                      onValueChange={() =>
+                        showtimeStore.setProp("upcomingOnly", !showtimeStore.upcomingOnly)
+                      }
+                      variant="switch"
+                      label="Only Show Upcoming"
+                      labelPosition="left"
+                      labelStyle={$labelStyle}
+                    />
+                  </View>
+                )}
+                {showtimeStore.showtimesForList.length > 0 && (
+                  <SegmentedControl
+                    style={$segmentStyle}
+                    values={["Start Time", "End Time", "Movie Name"]}
+                    selectedIndex={sortType}
+                    tintColor="#911"
+                    onChange={(event) => {
+                      setSortType(event.nativeEvent.selectedSegmentIndex)
+                    }}
+                  ></SegmentedControl>
+                )}
+              </View>
+            }
+            renderItem={({ item }) => <ShowtimeCard showtime={item} style={$showtimeCard} />}
+          />
+        </Screen>
+      </DrawerLayout>
     )
   },
 )
@@ -104,9 +169,14 @@ const $container: ViewStyle = {
   flex: 1,
 }
 
+const $drawer: ViewStyle = {
+  flex: 1,
+  backgroundColor: "white",
+}
+
 const $flatListContentContainer: ViewStyle = {
   paddingHorizontal: spacing.large,
-  paddingTop: spacing.large + spacing.extraLarge,
+  // paddingTop: spacing.large + spacing.extraLarge,
   paddingBottom: spacing.large,
 }
 
@@ -136,4 +206,15 @@ const $showtimeCard: TextStyle = {
 
 const $segmentStyle: TextStyle = {
   marginTop: spacing.medium,
+}
+
+const $logoImage: ImageStyle = {
+  height: 42,
+  width: 77,
+}
+
+const $logoContainer: ViewStyle = {
+  alignSelf: "flex-start",
+  height: 56,
+  paddingHorizontal: spacing.large,
 }

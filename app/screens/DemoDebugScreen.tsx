@@ -214,7 +214,7 @@ export const DemoDebugScreen: FC<DemoTabScreenProps<"DemoShowroom">> = function 
           ListHeaderComponent={
             <View style={$heading}>
               <Text preset="heading" style={$title}>
-                Components
+                Break Finder (WIP)
               </Text>
               <Text style={$tagline}>
                 This page lists the available components in the boilerplate for viewing purposes.
