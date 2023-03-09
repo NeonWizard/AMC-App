@@ -5,16 +5,18 @@ import {
   Image,
   ImageStyle,
   Platform,
+  ScrollView,
   TextStyle,
   View,
   ViewStyle,
 } from "react-native"
-import { DrawerLayout, DrawerState } from "react-native-gesture-handler"
+import { DrawerLayout, DrawerState, RefreshControl } from "react-native-gesture-handler"
 import { useSharedValue, withTiming } from "react-native-reanimated"
 import { Card, Header, Screen, Text } from "../../components"
-import { Showtime, ShowtimeModel } from "../../models/Showtime"
+import { useStores } from "../../models"
 import { DemoTabScreenProps } from "../../navigators/DemoNavigator"
 import { colors, spacing } from "../../theme"
+import { delay } from "../../utils/delay"
 import { useSafeAreaInsetsStyle } from "../../utils/useSafeAreaInsetsStyle"
 import { DrawerIconButton } from "./DrawerIconButton"
 import { ShowtimeCard } from "./ShowtimeCard"
@@ -71,40 +73,31 @@ const SidebarSectionElement: FC<SidebarSection> = ({ name, options }) => {
   )
 }
 
-const Showtimes: Showtime[] = []
-
-// Should be sorted by end time
-Showtimes.push(
-  ShowtimeModel.create({
-    title: "Matrix 8",
-    startTime: new Date().setMinutes(new Date().getMinutes() - 35),
-    endTime: new Date().setMinutes(new Date().getMinutes() + 79),
-    auditorium: 7,
-    description: "",
-  }),
-  ShowtimeModel.create({
-    title: "Why North Korea is Great",
-    startTime: new Date().setMinutes(new Date().getMinutes() - 14),
-    endTime: new Date().setMinutes(new Date().getMinutes() + 123),
-    auditorium: 12,
-    description: "hallo eviryone north korea",
-  }),
-  ShowtimeModel.create({
-    title: "Crasy: Loco",
-    startTime: new Date().setMinutes(new Date().getMinutes() + 7),
-    endTime: new Date().setMinutes(new Date().getMinutes() + 140),
-    auditorium: 4,
-    description: "",
-  }),
-)
-
 export const DemoShowroomScreen: FC<DemoTabScreenProps<"DemoShowroom">> =
   function DemoShowroomScreen(_props) {
+    const { showtimeStore } = useStores()
+
     const [open, setOpen] = useState(false)
+    const [refreshing, setRefreshing] = React.useState(false)
+
     const timeout = useRef<ReturnType<typeof setTimeout>>()
     const drawerRef = useRef<DrawerLayout>()
     const menuRef = useRef<FlatList>()
     const progress = useSharedValue(0)
+
+    // initially, kick off a background refresh without the refreshing UI
+    useEffect(() => {
+      ;(async function load() {
+        await showtimeStore.fetchShowtimes()
+      })()
+    }, [showtimeStore])
+
+    // simulate a longer refresh, if the refresh is too fast for UX
+    async function manualRefresh() {
+      setRefreshing(true)
+      await Promise.all([showtimeStore.fetchShowtimes(), delay(750)])
+      setRefreshing(false)
+    }
 
     const toggleDrawer = () => {
       if (!open) {
@@ -166,7 +159,12 @@ export const DemoShowroomScreen: FC<DemoTabScreenProps<"DemoShowroom">> =
             }
             style={$heading}
           />
-          <View style={$sectionListContentContainer}>
+          <ScrollView
+            style={$sectionListContentContainer}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={manualRefresh}></RefreshControl>
+            }
+          >
             {/* MAIN CONTENT */}
             <Card
               preset="reversed"
@@ -183,16 +181,26 @@ export const DemoShowroomScreen: FC<DemoTabScreenProps<"DemoShowroom">> =
               Upcoming Showtimes
             </Text>
             <View>
-              <FlatList
-                data={Showtimes}
-                style={$showtimeList}
-                renderItem={({ item }) => (
-                  <ShowtimeCard showtime={item} style={$showtimeCard}></ShowtimeCard>
-                )}
-                keyExtractor={(item) => `${item.title}-${item.startTime}-${item.auditorium}`}
-              ></FlatList>
+              {showtimeStore.upcomingShowtimes.length > 0 && (
+                <ShowtimeCard
+                  showtime={showtimeStore.upcomingShowtimes[0]}
+                  style={$showtimeCard}
+                ></ShowtimeCard>
+              )}
+              {showtimeStore.upcomingShowtimes.length > 1 && (
+                <ShowtimeCard
+                  showtime={showtimeStore.upcomingShowtimes[1]}
+                  style={$showtimeCard}
+                ></ShowtimeCard>
+              )}
+              {showtimeStore.upcomingShowtimes.length > 2 && (
+                <ShowtimeCard
+                  showtime={showtimeStore.upcomingShowtimes[2]}
+                  style={$showtimeCard}
+                ></ShowtimeCard>
+              )}
             </View>
-          </View>
+          </ScrollView>
         </Screen>
       </DrawerLayout>
     )
@@ -255,10 +263,6 @@ const $trafficContainerAlignmentStyle: TextStyle = {
 
 const $showtimeCard: TextStyle = {
   marginBottom: spacing.small,
-}
-
-const $showtimeList: TextStyle = {
-  backgroundColor: colors.background,
 }
 
 const $menuOption: TextStyle = {

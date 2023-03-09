@@ -114,13 +114,13 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> = obse
                 <EmptyState
                   preset="generic"
                   style={$emptyState}
-                  heading={showtimeStore.upcomingOnly ? "This looks a bit empty" : undefined}
+                  heading={showtimeStore.notFinishedOnly ? "This looks a bit empty" : undefined}
                   content={
-                    showtimeStore.upcomingOnly
+                    showtimeStore.notFinishedOnly
                       ? "There are no more upcoming showtimes today! Good job! :)"
                       : undefined
                   }
-                  button={showtimeStore.upcomingOnly ? null : undefined}
+                  button={showtimeStore.notFinishedOnly ? null : undefined}
                   buttonOnPress={manualRefresh}
                   imageStyle={$emptyStateImage}
                   ImageProps={{ resizeMode: "contain" }}
@@ -130,12 +130,12 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> = obse
             ListHeaderComponent={
               <View style={$heading}>
                 <Text preset="heading">Usher Schedule</Text>
-                {(showtimeStore.upcomingOnly || showtimeStore.showtimesForList.length > 0) && (
+                {(showtimeStore.notFinishedOnly || showtimeStore.showtimesForList.length > 0) && (
                   <View style={$toggle}>
                     <Toggle
-                      value={showtimeStore.upcomingOnly}
+                      value={showtimeStore.notFinishedOnly}
                       onValueChange={() =>
-                        showtimeStore.setProp("upcomingOnly", !showtimeStore.upcomingOnly)
+                        showtimeStore.setProp("notFinishedOnly", !showtimeStore.notFinishedOnly)
                       }
                       variant="switch"
                       label="Only Show Upcoming"

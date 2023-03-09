@@ -14,7 +14,7 @@ export interface ShowtimeCardProps {
 
   showtime: Showtime
 
-  crossedOff: boolean
+  crossedOff?: boolean
 }
 
 export const ShowtimeCard = observer(function ShowtimeCard(props: ShowtimeCardProps) {

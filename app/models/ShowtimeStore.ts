@@ -8,7 +8,7 @@ export const ShowtimeStoreModel = types
   .props({
     showtimes: types.array(ShowtimeModel),
     crossedOff: types.array(types.reference(ShowtimeModel)),
-    upcomingOnly: false,
+    notFinishedOnly: false,
   })
   .actions(withSetPropAction)
   .actions((store) => ({
@@ -29,11 +29,14 @@ export const ShowtimeStoreModel = types
   }))
   .views((store) => ({
     get showtimesForList() {
-      if (store.upcomingOnly) {
+      if (store.notFinishedOnly) {
         return store.showtimes.filter((showtime) => showtime.endTime > new Date())
       } else {
         return store.showtimes
       }
+    },
+    get upcomingShowtimes() {
+      return store.showtimes.filter((showtime) => showtime.startTime > new Date())
     },
 
     isCrossedOff(showtime: Showtime) {
