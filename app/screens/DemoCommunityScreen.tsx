@@ -152,6 +152,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> = obse
                     tintColor="#911"
                     onChange={(event) => {
                       setSortType(event.nativeEvent.selectedSegmentIndex)
+                      showtimeStore.setProp("sortType", event.nativeEvent.selectedSegmentIndex)
                     }}
                   ></SegmentedControl>
                 )}

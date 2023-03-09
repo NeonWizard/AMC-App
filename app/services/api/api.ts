@@ -101,7 +101,7 @@ export class Api {
         {
           title: "What where am I",
           startTime: new Date().setMinutes(new Date().getMinutes() - 300),
-          endTime: new Date().setMinutes(new Date().getMinutes() - 100),
+          endTime: new Date().setMinutes(new Date().getMinutes() + 100),
           auditorium: 8,
           description: "",
         },
@@ -122,7 +122,7 @@ export class Api {
         {
           title: "Crasy: Loco",
           startTime: new Date().setMinutes(new Date().getMinutes() + 7),
-          endTime: new Date().setMinutes(new Date().getMinutes() + 140),
+          endTime: new Date().setMinutes(new Date().getMinutes() + 33),
           auditorium: 4,
           description: "",
         },

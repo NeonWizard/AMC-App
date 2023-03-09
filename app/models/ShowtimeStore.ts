@@ -7,6 +7,7 @@ export const ShowtimeStoreModel = types
   .model("ShowtimeStore")
   .props({
     showtimes: types.array(ShowtimeModel),
+    sortType: 0,
     crossedOff: types.array(types.reference(ShowtimeModel)),
     notFinishedOnly: false,
   })
@@ -29,11 +30,37 @@ export const ShowtimeStoreModel = types
   }))
   .views((store) => ({
     get showtimesForList() {
-      if (store.notFinishedOnly) {
-        return store.showtimes.filter((showtime) => showtime.endTime > new Date())
-      } else {
-        return store.showtimes
+      // Start Time
+      if (store.sortType === 0) {
+        if (store.notFinishedOnly) {
+          return store.showtimes.filter((showtime) => showtime.startTime > new Date())
+        } else {
+          return [...store.showtimes].sort((showtimeA, showtimeB) => {
+            return showtimeA.startTime.getTime() - showtimeB.startTime.getTime()
+          })
+        }
       }
+      // End Time
+      else if (store.sortType === 1) {
+        if (store.notFinishedOnly) {
+          return store.showtimes.filter((showtime) => showtime.endTime > new Date())
+        } else {
+          return [...store.showtimes].sort((showtimeA, showtimeB) => {
+            return showtimeA.endTime.getTime() - showtimeB.endTime.getTime()
+          })
+        }
+      }
+      // Movie Name
+      else if (store.sortType === 2) {
+        if (store.notFinishedOnly) {
+          return store.showtimes.filter((showtime) => showtime.startTime > new Date())
+        } else {
+          return [...store.showtimes].sort((showtimeA, showtimeB) => {
+            return showtimeA.title < showtimeB.title ? -1 : 1
+          })
+        }
+      }
+      return store.showtimes
     },
     get upcomingShowtimes() {
       return store.showtimes.filter((showtime) => showtime.startTime > new Date())
