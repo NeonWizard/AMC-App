@@ -103,7 +103,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> = obse
           />
           <FlatList<Showtime>
             data={showtimeStore.showtimesForList}
-            // extraData={episodeStore.favorites.length + episodeStore.episodes.length}
+            extraData={showtimeStore.crossedOff.length + showtimeStore.showtimes.length}
             contentContainerStyle={$flatListContentContainer}
             refreshing={refreshing}
             onRefresh={manualRefresh}
@@ -158,7 +158,14 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> = obse
                 )}
               </View>
             }
-            renderItem={({ item }) => <ShowtimeCard showtime={item} style={$showtimeCard} />}
+            renderItem={({ item }) => (
+              <ShowtimeCard
+                showtime={item}
+                style={$showtimeCard}
+                crossedOff={showtimeStore.isCrossedOff(item)}
+                onCrossOff={() => showtimeStore.toggleCrossedOff(item)}
+              />
+            )}
           />
         </Screen>
       </DrawerLayout>

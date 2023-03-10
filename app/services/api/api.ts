@@ -64,6 +64,7 @@ export class Api {
       // Mock data, TODO
       const showtimes: ShowtimeSnapshotIn[] = [
         {
+          uid: "goog morning-1",
           title: "goog morning",
           startTime: new Date().setHours(9, 35), // 9:35am
           endTime: new Date().setHours(11, 28), // 11:28am
@@ -71,6 +72,7 @@ export class Api {
           description: "Good morning!!",
         },
         {
+          uid: "what-1",
           title: "What where am I",
           startTime: new Date().setHours(9, 59), // 9:59am
           endTime: new Date().setHours(15, 44), // 3:44pm
@@ -78,6 +80,7 @@ export class Api {
           description: "how did i get here",
         },
         {
+          uid: "matrix-1",
           title: "Matrix 8",
           startTime: new Date().setHours(10, 15), // 10:15am
           endTime: new Date().setHours(11, 22), // 11:22am
@@ -85,6 +88,7 @@ export class Api {
           description: "Slightly worse than Matrix 7",
         },
         {
+          uid: "north korea-1",
           title: "Why North Korea is Great",
           startTime: new Date().setHours(13, 0), // 1:00pm
           endTime: new Date().setHours(16, 37), // 4:37pm
@@ -92,6 +96,7 @@ export class Api {
           description: "hallo eviryone north korea",
         },
         {
+          uid: "crasy-1",
           title: "Crasy: Loco",
           startTime: new Date().setHours(13, 30), // 1:30pm
           endTime: new Date().setHours(15, 37), // 3:37pm
@@ -99,6 +104,7 @@ export class Api {
           description: "crasy. loco even",
         },
         {
+          uid: "matrix-2",
           title: "Matrix 8",
           startTime: new Date().setHours(15, 20), // 3:20pm
           endTime: new Date().setHours(16, 27), // 4:27pm
@@ -106,6 +112,7 @@ export class Api {
           description: "Slightly worse than Matrix 7",
         },
         {
+          uid: "aliens-1",
           title: "Aliens with lazerz",
           startTime: new Date().setHours(21, 30), // 9:30pm
           endTime: new Date().setHours(23, 26), // 11:26pm

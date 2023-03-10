@@ -7,7 +7,7 @@ import { withSetPropAction } from "./helpers/withSetPropAction"
 export const ShowtimeModel = types
   .model("Showtime")
   .props({
-    // uid: types.identifier,
+    uid: types.identifier,
     title: "",
     startTime: types.Date,
     endTime: types.Date,

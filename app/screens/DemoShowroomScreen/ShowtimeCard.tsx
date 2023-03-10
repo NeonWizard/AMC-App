@@ -16,10 +16,11 @@ export interface ShowtimeCardProps {
   showtime: Showtime
 
   crossedOff?: boolean
+  onCrossOff?: () => void
 }
 
 export const ShowtimeCard = observer(function ShowtimeCard(props: ShowtimeCardProps) {
-  const { style, showtime } = props
+  const { style, showtime, crossedOff, onCrossOff } = props
   const $styles = [$container, style]
 
   const [timeString, setTimeString] = useState("loading...")
@@ -63,14 +64,19 @@ export const ShowtimeCard = observer(function ShowtimeCard(props: ShowtimeCardPr
 
   return (
     <Card
-      style={[$styles, $crossedOff]}
+      style={[$styles, crossedOff ? $crossedOff : null]}
       verticalAlignment="force-footer-bottom"
+      onPress={onCrossOff}
       HeadingComponent={
         <View style={$metadata}>
-          <Text weight="semiBold" style={$metadataText} size="sm">
+          <Text
+            weight="semiBold"
+            style={[$metadataText, crossedOff ? $crossedOffText : null]}
+            size="sm"
+          >
             {showtime.title}
           </Text>
-          <Text style={$metadataText} size="xs">
+          <Text style={[$metadataText, crossedOff ? $crossedOffText : null]} size="xs">
             {timeString}
           </Text>
         </View>
@@ -78,16 +84,20 @@ export const ShowtimeCard = observer(function ShowtimeCard(props: ShowtimeCardPr
       FooterComponent={
         <View style={$footer}>
           <View style={$footerLeft}>
-            <Text style={$footerText} size="xxs">
-              <Text>Start: </Text>
+            <Text style={[$footerText, crossedOff ? $crossedOffText : null]} size="xxs">
+              <Text style={crossedOff ? $crossedOffText : null}>Start: </Text>
               {showtime.startString}
             </Text>
-            <Text style={$footerText} size="xxs">
-              <Text>End: </Text>
+            <Text style={[$footerText, crossedOff ? $crossedOffText : null]} size="xxs">
+              <Text style={crossedOff ? $crossedOffText : null}>End: </Text>
               {showtime.endString}
             </Text>
           </View>
-          <Text weight="semiBold" style={$footerAuditorium} size="xs">
+          <Text
+            weight="semiBold"
+            style={[$footerAuditorium, crossedOff ? $crossedOffText : null]}
+            size="xs"
+          >
             {showtime.auditorium}
           </Text>
         </View>
@@ -136,5 +146,10 @@ const $footerAuditorium: TextStyle = {
 }
 
 const $crossedOff: TextStyle = {
-  color: "yellow",
+  backgroundColor: colors.palette.neutral200,
+}
+
+const $crossedOffText: TextStyle = {
+  textDecorationLine: "line-through",
+  color: colors.palette.neutral300,
 }

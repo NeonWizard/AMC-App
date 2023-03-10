@@ -71,7 +71,7 @@ export const ShowtimeStoreModel = types
     },
   }))
   .actions((store) => ({
-    toggleFavorite(showtime: Showtime) {
+    toggleCrossedOff(showtime: Showtime) {
       if (store.isCrossedOff(showtime)) {
         store.uncrossOff(showtime)
       } else {
