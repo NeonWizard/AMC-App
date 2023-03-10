@@ -5,6 +5,7 @@ import { colors, spacing } from "../../theme"
 import { Text } from "../../components/Text"
 import { Showtime } from "../../models/Showtime"
 import { Card } from "../../components"
+import { useEffect, useState } from "react"
 
 export interface ShowtimeCardProps {
   /**
@@ -21,7 +22,9 @@ export const ShowtimeCard = observer(function ShowtimeCard(props: ShowtimeCardPr
   const { style, showtime } = props
   const $styles = [$container, style]
 
-  const getTime = () => {
+  const [timeString, setTimeString] = useState("loading...")
+
+  const getTimeString = () => {
     let seconds: number
     let prefix: string
 
@@ -43,7 +46,20 @@ export const ShowtimeCard = observer(function ShowtimeCard(props: ShowtimeCardPr
     return `${prefix} ${String(h).padStart(2, "0")}h:${String(m).padStart(2, "0")}m`
   }
 
-  // TODO: Update time remaining every minute
+  useEffect(() => {
+    // Set initial time string for card
+    setTimeString(getTimeString())
+
+    // Compute updated time string every second
+    const interval = setInterval(() => {
+      setTimeString(getTimeString())
+    }, 1000)
+
+    // Clear interval on unmount
+    return () => {
+      clearInterval(interval)
+    }
+  }, [showtime])
 
   return (
     <Card
@@ -55,7 +71,7 @@ export const ShowtimeCard = observer(function ShowtimeCard(props: ShowtimeCardPr
             {showtime.title}
           </Text>
           <Text style={$metadataText} size="xs">
-            {getTime()}
+            {timeString}
           </Text>
         </View>
       }
