@@ -32,32 +32,38 @@ export const ShowtimeStoreModel = types
     get showtimesForList() {
       // Start Time
       if (store.sortType === 0) {
+        const showtimes = [...store.showtimes].sort((showtimeA, showtimeB) => {
+          return showtimeA.startTime.getTime() - showtimeB.startTime.getTime()
+        })
+
         if (store.notFinishedOnly) {
-          return store.showtimes.filter((showtime) => showtime.startTime > new Date())
+          return showtimes.filter((showtime) => showtime.startTime > new Date())
         } else {
-          return [...store.showtimes].sort((showtimeA, showtimeB) => {
-            return showtimeA.startTime.getTime() - showtimeB.startTime.getTime()
-          })
+          return showtimes
         }
       }
       // End Time
       else if (store.sortType === 1) {
+        const showtimes = [...store.showtimes].sort((showtimeA, showtimeB) => {
+          return showtimeA.endTime.getTime() - showtimeB.endTime.getTime()
+        })
+
         if (store.notFinishedOnly) {
-          return store.showtimes.filter((showtime) => showtime.endTime > new Date())
+          return showtimes.filter((showtime) => showtime.endTime > new Date())
         } else {
-          return [...store.showtimes].sort((showtimeA, showtimeB) => {
-            return showtimeA.endTime.getTime() - showtimeB.endTime.getTime()
-          })
+          return showtimes
         }
       }
       // Movie Name
       else if (store.sortType === 2) {
+        const showtimes = [...store.showtimes].sort((showtimeA, showtimeB) => {
+          return showtimeA.title < showtimeB.title ? -1 : 1
+        })
+
         if (store.notFinishedOnly) {
-          return store.showtimes.filter((showtime) => showtime.startTime > new Date())
+          return showtimes.filter((showtime) => showtime.startTime > new Date())
         } else {
-          return [...store.showtimes].sort((showtimeA, showtimeB) => {
-            return showtimeA.title < showtimeB.title ? -1 : 1
-          })
+          return showtimes
         }
       }
       return store.showtimes
