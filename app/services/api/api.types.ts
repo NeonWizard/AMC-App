@@ -47,6 +47,11 @@ export interface ApiConfig {
   url: string
 
   /**
+   * The AMC API key (i know this is bad but i don't have a backend server rn)
+   */
+  api_key: string
+
+  /**
    * Milliseconds before we timeout the request.
    */
   timeout: number

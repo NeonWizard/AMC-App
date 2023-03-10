@@ -5,18 +5,10 @@
  * See the [Backend API Integration](https://github.com/infinitered/ignite/blob/master/docs/Backend-API-Integration.md)
  * documentation for more details.
  */
-import {
-  ApiResponse, // @demo remove-current-line
-  ApisauceInstance,
-  create,
-} from "apisauce"
+import { ApisauceInstance, create } from "apisauce"
 import Config from "../../config"
-import { GeneralApiProblem, getGeneralApiProblem } from "./apiProblem" // @demo remove-current-line
-import type {
-  ApiConfig,
-  ApiFeedResponse, // @demo remove-current-line
-} from "./api.types"
-import type { EpisodeSnapshotIn } from "../../models/Episode" // @demo remove-current-line
+import { GeneralApiProblem } from "./apiProblem" // @demo remove-current-line
+import type { ApiConfig } from "./api.types"
 import { ShowtimeSnapshotIn } from "../../models/Showtime"
 
 /**
@@ -24,6 +16,7 @@ import { ShowtimeSnapshotIn } from "../../models/Showtime"
  */
 export const DEFAULT_API_CONFIG: ApiConfig = {
   url: Config.API_URL,
+  api_key: Config.API_KEY,
   timeout: 10000,
 }
 
@@ -45,98 +38,77 @@ export class Api {
       timeout: this.config.timeout,
       headers: {
         Accept: "application/json",
+        "X-AMC-Vendor-Key": this.config.api_key,
       },
     })
   }
 
-  // @demo remove-block-start
   /**
-   * Gets a list of recent React Native Radio episodes.
+   * Gets a list of today's movie showtimes
    */
-  async getEpisodes(): Promise<{ kind: "ok"; episodes: EpisodeSnapshotIn[] } | GeneralApiProblem> {
-    // make the api call
-    const response: ApiResponse<ApiFeedResponse> = await this.apisauce.get(
-      `api.json?rss_url=https%3A%2F%2Ffeeds.simplecast.com%2FhEI_f9Dx`,
-    )
-
-    // the typical ways to die when calling an api
-    if (!response.ok) {
-      const problem = getGeneralApiProblem(response)
-      if (problem) return problem
-    }
-
-    // transform the data into the format we are expecting
-    try {
-      const rawData = response.data
-      console.log(rawData.items)
-
-      // This is where we transform the data into the shape we expect for our MST model.
-      const episodes: EpisodeSnapshotIn[] = rawData.items.map((raw) => ({
-        ...raw,
-      }))
-
-      return { kind: "ok", episodes }
-    } catch (e) {
-      if (__DEV__) {
-        console.tron.error(`Bad data: ${e.message}\n${response.data}`, e.stack)
-      }
-      return { kind: "bad-data" }
-    }
-  }
-  // @demo remove-block-end
-
   async getShowtimes(): Promise<
     { kind: "ok"; showtimes: ShowtimeSnapshotIn[] } | GeneralApiProblem
   > {
+    // -- AMC devs smell bad and won't authorize my token
+    // const response: ApiResponse<AMCAPIResponse> = await this.apisauce.get(
+    //   `theatres/${Config.THEATER_ID}/showtimes`,
+    // )
+
+    // if (!response.ok) {
+    //   const problem = getGeneralApiProblem(response)
+    //   console.log(problem)
+    //   if (problem) return problem
+    // }
+
     try {
       // Mock data, TODO
       const showtimes: ShowtimeSnapshotIn[] = [
         {
           title: "goog morning",
-          startTime: new Date().setMinutes(new Date().getMinutes() - 590),
-          endTime: new Date().setMinutes(new Date().getMinutes() - 563),
+          startTime: new Date().setHours(9, 35), // 9:35am
+          endTime: new Date().setHours(11, 28), // 11:28am
           auditorium: 1,
-          description: "",
+          description: "Good morning!!",
         },
         {
           title: "What where am I",
-          startTime: new Date().setMinutes(new Date().getMinutes() - 300),
-          endTime: new Date().setMinutes(new Date().getMinutes() + 100),
+          startTime: new Date().setHours(9, 59), // 9:59am
+          endTime: new Date().setHours(15, 44), // 3:44pm
           auditorium: 8,
-          description: "",
+          description: "how did i get here",
         },
         {
           title: "Matrix 8",
-          startTime: new Date().setMinutes(new Date().getMinutes() - 35),
-          endTime: new Date().setMinutes(new Date().getMinutes() + 79),
+          startTime: new Date().setHours(10, 15), // 10:15am
+          endTime: new Date().setHours(11, 22), // 11:22am
           auditorium: 7,
-          description: "",
+          description: "Slightly worse than Matrix 7",
         },
         {
           title: "Why North Korea is Great",
-          startTime: new Date().setMinutes(new Date().getMinutes() - 14),
-          endTime: new Date().setMinutes(new Date().getMinutes() + 123),
+          startTime: new Date().setHours(13, 0), // 1:00pm
+          endTime: new Date().setHours(16, 37), // 4:37pm
           auditorium: 12,
           description: "hallo eviryone north korea",
         },
         {
           title: "Crasy: Loco",
-          startTime: new Date().setMinutes(new Date().getMinutes() + 7),
-          endTime: new Date().setMinutes(new Date().getMinutes() + 33),
+          startTime: new Date().setHours(13, 30), // 1:30pm
+          endTime: new Date().setHours(15, 37), // 3:37pm
           auditorium: 4,
-          description: "",
+          description: "crasy. loco even",
         },
         {
           title: "Matrix 8",
-          startTime: new Date().setMinutes(new Date().getMinutes() + 109),
-          endTime: new Date().setMinutes(new Date().getMinutes() + 253),
+          startTime: new Date().setHours(15, 20), // 3:20pm
+          endTime: new Date().setHours(16, 27), // 4:27pm
           auditorium: 7,
-          description: "",
+          description: "Slightly worse than Matrix 7",
         },
         {
           title: "Aliens with lazerz",
-          startTime: new Date().setMinutes(new Date().getMinutes() + 450),
-          endTime: new Date().setMinutes(new Date().getMinutes() + 599),
+          startTime: new Date().setHours(21, 30), // 9:30pm
+          endTime: new Date().setHours(23, 26), // 11:26pm
           auditorium: 3,
           description: "these aliens got big laserz mann",
         },
