@@ -18,17 +18,17 @@ import { useSharedValue, withTiming } from "react-native-reanimated"
 import { EmptyState, Header, Screen, Text, Toggle } from "../components"
 import { useStores } from "../models"
 import { Showtime } from "../models/Showtime"
-import { DemoTabScreenProps } from "../navigators/DemoNavigator"
+import { TabScreenProps } from "../navigators/DemoNavigator"
 import { colors, spacing } from "../theme"
 import { delay } from "../utils/delay"
 import { useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
-import { DrawerIconButton } from "./DemoShowroomScreen/DrawerIconButton"
-import { ShowtimeCard } from "./DemoShowroomScreen/ShowtimeCard"
+import { DrawerIconButton } from "./HomeScreen/DrawerIconButton"
+import { ShowtimeCard } from "./HomeScreen/ShowtimeCard"
 
 const logo = require("../../assets/images/logo.png")
 
-export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> = observer(
-  function DemoCommunityScreen(_props) {
+export const UsherScheduleScreen: FC<TabScreenProps<"UsherSchedule">> = observer(
+  function UsherScheduleScreen(_props) {
     const { showtimeStore } = useStores()
 
     const [refreshing, setRefreshing] = React.useState(false)

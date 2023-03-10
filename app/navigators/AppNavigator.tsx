@@ -17,11 +17,8 @@ import React from "react"
 import { useColorScheme } from "react-native"
 import Config from "../config"
 import { useStores } from "../models"
-import {
-  LoginScreen,
-  WelcomeScreen,
-} from "../screens"
-import { DemoNavigator, DemoTabParamList } from "./DemoNavigator" // @demo remove-current-line
+import { LoginScreen, WelcomeScreen } from "../screens"
+import { DemoNavigator, TabParamList } from "./DemoNavigator" // @demo remove-current-line
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 
 /**
@@ -40,7 +37,7 @@ import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 export type AppStackParamList = {
   Welcome: undefined
   Login: undefined // @demo remove-current-line
-  Demo: NavigatorScreenParams<DemoTabParamList> // @demo remove-current-line
+  Demo: NavigatorScreenParams<TabParamList>
   // 🔥 Your screens go here
 }
 
