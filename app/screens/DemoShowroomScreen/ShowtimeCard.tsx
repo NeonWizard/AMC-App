@@ -21,8 +21,17 @@ export const ShowtimeCard = observer(function ShowtimeCard(props: ShowtimeCardPr
   const { style, showtime } = props
   const $styles = [$container, style]
 
-  const getTimeRemaining = () => {
-    const seconds = (showtime.endTime.getTime() - new Date().getTime()) / 1000
+  const getTime = () => {
+    let seconds: number
+    let prefix: string
+
+    if (showtime.startTime > new Date()) {
+      seconds = (showtime.startTime.getTime() - new Date().getTime()) / 1000
+      prefix = "in"
+    } else {
+      seconds = (showtime.endTime.getTime() - new Date().getTime()) / 1000
+      prefix = "ends in"
+    }
 
     if (seconds < 0) {
       return "completed"
@@ -31,7 +40,7 @@ export const ShowtimeCard = observer(function ShowtimeCard(props: ShowtimeCardPr
     const h = Math.floor(seconds / 3600)
     const m = Math.floor((seconds % 3600) / 60)
 
-    return `in ${String(h).padStart(2, "0")}h:${String(m).padStart(2, "0")}m`
+    return `${prefix} ${String(h).padStart(2, "0")}h:${String(m).padStart(2, "0")}m`
   }
 
   // TODO: Update time remaining every minute
@@ -46,7 +55,7 @@ export const ShowtimeCard = observer(function ShowtimeCard(props: ShowtimeCardPr
             {showtime.title}
           </Text>
           <Text style={$metadataText} size="xs">
-            {getTimeRemaining()}
+            {getTime()}
           </Text>
         </View>
       }
